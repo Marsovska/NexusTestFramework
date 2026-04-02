@@ -7,18 +7,21 @@ import org.openqa.selenium.support.PageFactory;
 
 public class LoginPage {
 
-    private WebDriver driver;
+    public WebDriver driver;
     @FindBy(id = "username")
-    private WebElement userNameField;
+    public WebElement userNameField;
 
     @FindBy(id = "password")
-    private WebElement passwordField;
+    public WebElement passwordField;
 
     @FindBy(id = "submit")
-    private WebElement submitButton;
+    public WebElement submitButton;
 
-    @FindBy(xpath = "//h1[contains(text(),'Logged In Successfully')]")
-    private WebElement successMessage;
+    @FindBy(xpath = "//strong[ contains(text(),'Congratulations')]")
+    public WebElement successTextElement;
+
+    @FindBy(xpath = "//a[contains(text(),'Log out')]")
+    public WebElement logoutButton;
 
     public LoginPage(WebDriver driver) {
         this.driver = driver;
@@ -43,7 +46,15 @@ public class LoginPage {
         clickLoginButton();
     }
 
-    public boolean isSuccessMessageDisplayed() {
-        return successMessage.isDisplayed();
+    public String getCurrentUrl() {
+        return driver.getCurrentUrl();
+    }
+
+    public boolean isLogoutButtonDisplayed() {
+        try {
+            return logoutButton.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

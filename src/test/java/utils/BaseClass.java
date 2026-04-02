@@ -2,9 +2,12 @@ package utils;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterMethod;
@@ -15,7 +18,7 @@ import java.time.Duration;
 public class BaseClass {
 
     private static final Logger log = LoggerFactory.getLogger(BaseClass.class);
-    protected WebDriver driver;
+    public static WebDriver driver;
     private static final Logger logger = LoggerFactory.getLogger(BaseClass.class);
 
     @BeforeMethod(alwaysRun = true)
@@ -55,4 +58,16 @@ public class BaseClass {
             driver.quit();
         }
     }
+public static WebDriverWait getWait() {
+        WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(Constants.EXPLICIT_WAIT));
+        return wait;
 }
+
+public static void waitForVisibilityOfElement (WebElement element) {
+        getWait().until(ExpectedConditions.visibilityOf(element));
+}
+public static void waitForElementToBeCLickable (WebElement element) {
+        getWait().until(ExpectedConditions.elementToBeClickable(element));
+}
+}
+
