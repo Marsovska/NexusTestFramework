@@ -24,7 +24,6 @@ import java.util.Date;
 
 public class BaseClass {
 
-    private static final Logger log = LoggerFactory.getLogger(BaseClass.class);
     public static WebDriver driver;
     private static final Logger logger = LoggerFactory.getLogger(BaseClass.class);
 
@@ -63,11 +62,12 @@ public class BaseClass {
         if (driver != null) {
             logger.info("Closing browser");
             driver.quit();
+            driver = null;
         }
     }
+
 public static WebDriverWait getWait() {
-        WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(Constants.EXPLICIT_WAIT));
-        return wait;
+        return new WebDriverWait(driver, Duration.ofSeconds(Constants.EXPLICIT_WAIT));
 }
 
 public static void waitForVisibilityOfElement (WebElement element) {
@@ -77,17 +77,24 @@ public static void waitForElementToBeCLickable (WebElement element) {
         getWait().until(ExpectedConditions.elementToBeClickable(element));
 }
 
-public static String takeScreenshot (String tetName) {
+public static String takeScreenshot (String testName) {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String screenshotPath= "test-output/screenshots/" + tetName + "_" + timeStamp + ".png";
+        String screenshotPath= "test-output/screenshots/" + testName + "_" + timeStamp + ".png";
 
         File srcFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
         File destFile = new File(screenshotPath);
 
         try {
+            // Without this, screenshot saving can fail if /screenshots/ does not exist yet.
+            File parentDir = destFile.getParentFile();
+            if (parentDir != null && !parentDir.exists()){
+                parentDir.mkdirs();
+            }
             FileUtils.copyFile(srcFile,destFile);
+            logger.info("Screenshot saved at: {}", screenshotPath);
+
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save screensht: "+ e.getMessage());
+            throw new RuntimeException("Failed to save screenshot: "+ e.getMessage());
         }
         return screenshotPath;
 }
