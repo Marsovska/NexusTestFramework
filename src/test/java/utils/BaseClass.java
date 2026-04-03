@@ -1,6 +1,9 @@
 package utils;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -13,7 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Date;
 
 public class BaseClass {
 
@@ -68,6 +75,21 @@ public static void waitForVisibilityOfElement (WebElement element) {
 }
 public static void waitForElementToBeCLickable (WebElement element) {
         getWait().until(ExpectedConditions.elementToBeClickable(element));
+}
+
+public static String takeScreenshot (String tetName) {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String screenshotPath= "test-output/screenshots/" + tetName + "_" + timeStamp + ".png";
+
+        File srcFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        File destFile = new File(screenshotPath);
+
+        try {
+            FileUtils.copyFile(srcFile,destFile);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save screensht: "+ e.getMessage());
+        }
+        return screenshotPath;
 }
 }
 
