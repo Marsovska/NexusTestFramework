@@ -1,6 +1,9 @@
 package utils;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -13,11 +16,14 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Date;
 
 public class BaseClass {
 
-    private static final Logger log = LoggerFactory.getLogger(BaseClass.class);
     public static WebDriver driver;
     private static final Logger logger = LoggerFactory.getLogger(BaseClass.class);
 
@@ -56,11 +62,12 @@ public class BaseClass {
         if (driver != null) {
             logger.info("Closing browser");
             driver.quit();
+            driver = null;
         }
     }
+
 public static WebDriverWait getWait() {
-        WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(Constants.EXPLICIT_WAIT));
-        return wait;
+        return new WebDriverWait(driver, Duration.ofSeconds(Constants.EXPLICIT_WAIT));
 }
 
 public static void waitForVisibilityOfElement (WebElement element) {
@@ -68,6 +75,28 @@ public static void waitForVisibilityOfElement (WebElement element) {
 }
 public static void waitForElementToBeCLickable (WebElement element) {
         getWait().until(ExpectedConditions.elementToBeClickable(element));
+}
+
+public static String takeScreenshot (String testName) {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String screenshotPath= "test-output/screenshots/" + testName + "_" + timeStamp + ".png";
+
+        File srcFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        File destFile = new File(screenshotPath);
+
+        try {
+            // Without this, screenshot saving can fail if /screenshots/ does not exist yet.
+            File parentDir = destFile.getParentFile();
+            if (parentDir != null && !parentDir.exists()){
+                parentDir.mkdirs();
+            }
+            FileUtils.copyFile(srcFile,destFile);
+            logger.info("Screenshot saved at: {}", screenshotPath);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save screenshot: "+ e.getMessage());
+        }
+        return screenshotPath;
 }
 }
 
