@@ -24,7 +24,7 @@ public class LoginPositiveTest extends BaseClass {
 
         // 2. Verify new page contains expected text ('Congratulations')
         waitForVisibilityOfElement(loginPage.successTextElement);
-        String successText = loginPage.successTextElement.getText();
+        String successText = loginPage.getSuccessMessage();
         Assert.assertTrue(successText.contains("Congratulations") || successText.contains("successfully logged in"),
                 "Success message does not contains expected text. Actual message: " + successText);
 

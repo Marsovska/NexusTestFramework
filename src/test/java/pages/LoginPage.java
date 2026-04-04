@@ -57,4 +57,7 @@ public class LoginPage {
             return false;
         }
     }
+    public String getSuccessMessage(){
+        return successTextElement.getText();
+    }
 }
